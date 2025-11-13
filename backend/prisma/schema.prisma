@@ -1,0 +1,96 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id               String   @id @default(cuid())
+  email            String   @unique
+  name             String?
+  password         String
+  role             Role     @default(USER)
+  hashRefreshToken String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  cars             Car[]
+
+  @@map("users")
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+model Brand {
+  id        String   @id @default(cuid())
+  name      String
+  logoUrl   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  cars      Car[]
+
+  @@map("brands")
+}
+
+model Car {
+  id           String       @id @default(cuid())
+  brandId      String
+  Brand        Brand        @relation(fields: [brandId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  model        String
+  year         Int          @db.SmallInt
+  price        Int
+  mileage      Int          @default(0)
+  fuelType     FuelType
+  condition    Condition
+  transmission Transmission
+  description  String
+  location     String
+  images       String[]
+  phone        String
+  userId       String
+  status       PostStatus   @default(APPROVED)
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  User         User         @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@map("cars")
+}
+
+enum FuelType {
+  ELECTRIC
+  HYBRID
+  PETROL
+  DIESEL
+}
+
+enum Condition {
+  NEW
+  LIKE_NEW
+  USED
+  CERTIFIED_PREOWNED
+}
+
+enum Transmission {
+  AUTOMATIC
+  MANUAL
+  CVT
+}
+
+enum PostStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
