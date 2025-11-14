@@ -4,10 +4,29 @@ import Link from "next/link";
 import { TiFlashOutline } from "react-icons/ti";
 
 import { useAuth } from "@/hooks";
-import { usePathname } from "next/navigation";
-import { FaRegHeart, FaRegUser } from "react-icons/fa";
+import { usePathname, useRouter } from "next/navigation";
+import {
+    FaCog,
+    FaRegHeart,
+    FaRegListAlt,
+    FaRegUser,
+    FaRegUserCircle,
+    FaSignOutAlt,
+} from "react-icons/fa";
 import { PiChatBold } from "react-icons/pi";
 import { Button } from "./ui/button";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuGroup,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
+import { useMutation } from "@tanstack/react-query";
+import { logoutUser } from "@/api/auth";
+import { useTokensStore } from "@/stores";
 
 export default function Header() {
     const pathname = usePathname();
@@ -23,6 +42,15 @@ export default function Header() {
     const isActive = (path: string) => pathname === path;
 
     const { user } = useAuth();
+    const clearTokens = useTokensStore((state) => state.clearTokens);
+
+    const { mutateAsync: logout } = useMutation({
+        mutationFn: logoutUser,
+        mutationKey: ["logout"],
+        onSuccess: () => {
+            clearTokens();
+        },
+    });
 
     return (
         <header className="sticky top-0 z-50 w-full bg-white/95 backdrop-blur-sm border-b border-gray-200 shadow-sm">
@@ -78,15 +106,62 @@ export default function Header() {
                                 </Button>
                             </Link>
 
-                            <Link href={"/"}>
-                                <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    className="hidden sm:inline-flex text-gray-600 hover:text-emerald-600"
+                            <DropdownMenu modal={false}>
+                                <DropdownMenuTrigger asChild>
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        className="hidden sm:inline-flex text-gray-600 hover:text-emerald-600"
+                                    >
+                                        <FaRegUser className="w-5 h-5" />
+                                    </Button>
+                                </DropdownMenuTrigger>
+
+                                <DropdownMenuContent
+                                    align="end"
+                                    sideOffset={8}
+                                    className="w-48"
                                 >
-                                    <FaRegUser className="w-5 h-5" />
-                                </Button>
-                            </Link>
+                                    <DropdownMenuLabel className="px-3 py-2 text-sm font-semibold text-gray-800 border-b border-gray-100">
+                                        My Account
+                                    </DropdownMenuLabel>
+
+                                    <DropdownMenuGroup>
+                                        <DropdownMenuItem className="flex items-center gap-2 px-3 py-2 font-medium text-gray-600 cursor-pointer">
+                                            <FaRegUserCircle className="w-4 h-4" />
+
+                                            <span>Profile</span>
+                                        </DropdownMenuItem>
+
+                                        <DropdownMenuItem className="flex items-center gap-2 px-3 py-2 font-medium text-gray-600 cursor-pointer">
+                                            <FaRegListAlt className="w-4 h-4" />
+
+                                            <span>My Listings</span>
+                                        </DropdownMenuItem>
+
+                                        <DropdownMenuItem className="flex items-center gap-2 px-3 py-2 font-medium text-gray-600 cursor-pointer">
+                                            <FaRegHeart className="w-4 h-4" />
+                                            <span>Favorites</span>
+                                        </DropdownMenuItem>
+
+                                        <DropdownMenuItem className="flex items-center gap-2 px-3 py-2 font-medium text-gray-600 cursor-pointer">
+                                            <FaCog className="w-4 h-4" />
+                                            <span>Settings</span>
+                                        </DropdownMenuItem>
+                                    </DropdownMenuGroup>
+
+                                    <DropdownMenuSeparator className="my-1" />
+
+                                    <DropdownMenuItem
+                                        className="flex items-center gap-2 px-3 py-2 font-medium text-gray-600 cursor-pointer"
+                                        onClick={() => logout()}
+                                    >
+                                        <FaSignOutAlt className="w-4 h-4" />
+
+                                        <span>Log out</span>
+                                    </DropdownMenuItem>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
                         </div>
                     ) : (
                         <div className="flex items-center gap-2 lg:gap-4">

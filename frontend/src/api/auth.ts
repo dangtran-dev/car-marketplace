@@ -58,3 +58,13 @@ export const checkAuth = async () => {
         throw new Error("Unexpected error while checking authentication.");
     }
 };
+
+export const logoutUser = async () => {
+    try {
+        const response = await instance.post("/auth/logout");
+        console.log(response.data);
+        return response.data.message;
+    } catch (error: any) {
+        throw new Error("An error occurred during logout");
+    }
+};

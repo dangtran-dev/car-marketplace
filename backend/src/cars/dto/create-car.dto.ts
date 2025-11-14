@@ -1,5 +1,6 @@
 import { Type } from 'class-transformer';
 import { IsNotEmpty, IsNumber, IsString, Matches, Min } from 'class-validator';
+import { Condition, FuelType, Transmission } from 'generated/prisma';
 
 export class CreateCarDto {
   @IsNotEmpty()
@@ -30,15 +31,15 @@ export class CreateCarDto {
 
   @IsNotEmpty()
   @IsString()
-  fuelType: string;
+  fuelType: FuelType;
 
   @IsNotEmpty()
   @IsString()
-  condition: string;
+  condition: Condition;
 
   @IsNotEmpty()
   @IsString()
-  transmission: string;
+  transmission: Transmission;
 
   @IsNotEmpty()
   @IsString()
