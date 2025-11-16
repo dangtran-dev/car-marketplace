@@ -1,16 +1,9 @@
 "use client";
 
-import LoadingDots from "@/components/loader";
-import { useCheckAuthRedirect, useLoading } from "@/hooks";
 import { TiFlashOutline } from "react-icons/ti";
 import SignUpForm from "./signup-form";
 
 export default function SignUpWrapper() {
-    const authStatus = useCheckAuthRedirect(false);
-    const isLoading = useLoading();
-
-    if (isLoading || !authStatus) return <LoadingDots />;
-
     return (
         <div>
             <section className="py-5">

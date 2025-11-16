@@ -1,7 +1,7 @@
 import Header from "@/components/header";
-import "../globals.css";
+import React from "react";
 
-export default function UserLayout({
+export default async function UserLayout({
     children,
 }: Readonly<{
     children: React.ReactNode;

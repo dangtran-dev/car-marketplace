@@ -7,12 +7,16 @@ import { useQuery } from "@tanstack/react-query";
 export function useAuth() {
     const accessToken = useTokensStore((state) => state.accessToken);
 
-    const { data: user, isLoading } = useQuery({
+    const {
+        data: user,
+        isLoading,
+        isFetching,
+    } = useQuery({
         queryFn: () => checkAuth(),
         queryKey: ["authStatus", accessToken],
         enabled: !!accessToken,
         retry: false,
     });
 
-    return { user, isLoading };
+    return { user, isLoading, isFetching };
 }

@@ -1,2 +1,2 @@
-export * from './tokens.types';
-export * from './user.types';
+export * from './tokens.type';
+export * from './user.type';

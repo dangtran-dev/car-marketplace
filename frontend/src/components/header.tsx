@@ -3,8 +3,12 @@
 import Link from "next/link";
 import { TiFlashOutline } from "react-icons/ti";
 
-import { useAuth } from "@/hooks";
-import { usePathname, useRouter } from "next/navigation";
+import { logoutUser } from "@/api/auth";
+import { AuthContext } from "@/providers";
+import { useTokensStore } from "@/stores";
+import { useMutation } from "@tanstack/react-query";
+import { usePathname } from "next/navigation";
+import { useContext } from "react";
 import {
     FaCog,
     FaRegHeart,
@@ -24,9 +28,6 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
-import { useMutation } from "@tanstack/react-query";
-import { logoutUser } from "@/api/auth";
-import { useTokensStore } from "@/stores";
 
 export default function Header() {
     const pathname = usePathname();
@@ -41,8 +42,9 @@ export default function Header() {
 
     const isActive = (path: string) => pathname === path;
 
-    const { user } = useAuth();
     const clearTokens = useTokensStore((state) => state.clearTokens);
+
+    const user = useContext(AuthContext);
 
     const { mutateAsync: logout } = useMutation({
         mutationFn: logoutUser,

@@ -1,3 +1,4 @@
+import AuthProvider from "@/providers/auth-provider.provider";
 import type { Metadata } from "next";
 import { Montserrat } from "next/font/google";
 import "./globals.css";
@@ -13,7 +14,7 @@ const montserrat = Montserrat({
     variable: "--font-montserrat",
 });
 
-export default function UserLayout({
+export default function RootLayout({
     children,
 }: Readonly<{
     children: React.ReactNode;
@@ -21,7 +22,9 @@ export default function UserLayout({
     return (
         <html lang="en" className={montserrat.variable}>
             <body className="antialiased">
-                <Providers>{children}</Providers>
+                <Providers>
+                    <AuthProvider>{children}</AuthProvider>
+                </Providers>
             </body>
         </html>
     );

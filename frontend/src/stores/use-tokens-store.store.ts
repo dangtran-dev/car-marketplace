@@ -10,7 +10,7 @@ type TokensStore = {
 
 export const useTokensStore = create<TokensStore>()(
     persist(
-        (set, get) => ({
+        (set) => ({
             accessToken: null,
             refreshToken: null,
             setTokens: (accessToken, refreshToken) =>

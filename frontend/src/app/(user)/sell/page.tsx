@@ -21,10 +21,12 @@ import {
 } from "@/components/ui/field";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
+import { AuthContext } from "@/providers";
 import { Brand } from "@/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQuery } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useContext, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FaCheck } from "react-icons/fa6";
 import * as z from "zod";
@@ -101,6 +103,13 @@ const formSchema = z.object({
 });
 
 export default function SellPage() {
+    const user = useContext(AuthContext);
+    const router = useRouter();
+
+    if (!user) {
+        router.replace("/signin");
+    }
+
     const steps = ["Basic Info", "Details & Photos", "Contact & Publish"];
 
     const [currentStep, setCurrentStep] = useState(0);
