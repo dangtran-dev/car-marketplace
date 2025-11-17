@@ -8,7 +8,7 @@ import { AuthContext } from "@/providers";
 import { useTokensStore } from "@/stores";
 import { useMutation } from "@tanstack/react-query";
 import { usePathname } from "next/navigation";
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import {
     FaCog,
     FaRegHeart,
@@ -45,6 +45,12 @@ export default function Header() {
     const clearTokens = useTokensStore((state) => state.clearTokens);
 
     const user = useContext(AuthContext);
+
+    const [signedIn, setSignedIn] = useState(false);
+
+    useEffect(() => {
+        setSignedIn(!!user);
+    }, [user]);
 
     const { mutateAsync: logout } = useMutation({
         mutationFn: logoutUser,
@@ -86,7 +92,7 @@ export default function Header() {
                         ))}
                     </nav>
 
-                    {user ? (
+                    {signedIn ? (
                         <div className="flex items-center gap-2 lg:gap-4">
                             <Link href={"/"}>
                                 <Button

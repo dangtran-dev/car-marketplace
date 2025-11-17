@@ -43,7 +43,7 @@ export const signInLocal = async (auth: AuthSignIn) => {
     }
 };
 
-export const checkAuth = async () => {
+export const checkAuth = async (): Promise<AuthSignUp> => {
     try {
         const response = await instance.get("/auth/me");
         return response.data;

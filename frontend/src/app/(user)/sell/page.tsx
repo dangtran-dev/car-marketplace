@@ -26,7 +26,7 @@ import { Brand } from "@/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { useContext, useMemo, useState } from "react";
+import { useContext, useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FaCheck } from "react-icons/fa6";
 import * as z from "zod";
@@ -103,16 +103,33 @@ const formSchema = z.object({
 });
 
 export default function SellPage() {
-    const user = useContext(AuthContext);
-    const router = useRouter();
-
-    if (!user) {
-        router.replace("/signin");
-    }
-
     const steps = ["Basic Info", "Details & Photos", "Contact & Publish"];
 
     const [currentStep, setCurrentStep] = useState(0);
+
+    const user = useContext(AuthContext);
+    const router = useRouter();
+
+    useEffect(() => {
+        if (!user) {
+            console.log(user);
+            router.replace("/signin");
+        }
+    }, [user, router]);
+
+    const { data: location } = useQuery<string[]>({
+        queryFn: getLocation,
+        queryKey: ["location"],
+    });
+
+    const { data: brands } = useQuery<Brand[]>({
+        queryFn: getCarBrands,
+        queryKey: ["brands"],
+    });
+
+    const nameBrands = useMemo(() => {
+        return brands?.map((brand) => brand.name);
+    }, [brands]);
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -135,19 +152,13 @@ export default function SellPage() {
         mode: "all",
     });
 
-    const { data: location } = useQuery<string[]>({
-        queryFn: getLocation,
-        queryKey: ["location"],
-    });
+    useEffect(() => {
+        if (user) {
+            form.setValue("name", user.name);
+            form.setValue("email", user.email);
+        }
+    }, [user, form]);
 
-    const { data: brands } = useQuery<Brand[]>({
-        queryFn: getCarBrands,
-        queryKey: ["brands"],
-    });
-
-    const nameBrands = useMemo(() => {
-        return brands?.map((brand) => brand.name);
-    }, [brands]);
     const condition = form.watch("condition");
 
     return (

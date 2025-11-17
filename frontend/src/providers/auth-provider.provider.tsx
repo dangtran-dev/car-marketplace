@@ -2,9 +2,11 @@
 
 import LoadingDots from "@/components/loader";
 import { useAuth } from "@/hooks";
-import { createContext } from "react";
+import { useTokensStore } from "@/stores";
+import { AuthSignUp } from "@/types";
+import { createContext, useEffect, useState } from "react";
 
-export const AuthContext = createContext(null);
+export const AuthContext = createContext<AuthSignUp | undefined>(undefined);
 
 export default function AuthProvider({
     children,
@@ -12,10 +14,18 @@ export default function AuthProvider({
     children: React.ReactNode;
 }) {
     const { user, isLoading, isFetching } = useAuth();
+    const [isHydrated, setIsHydrated] = useState(false);
+    const storeIsHydrated = useTokensStore((state) => state.isHydrated);
 
-    if (isLoading || isFetching) {
+    useEffect(() => {
+        if (storeIsHydrated) {
+            setIsHydrated(true);
+        }
+    }, [storeIsHydrated]);
+
+    if (isLoading || isFetching || !isHydrated) {
         return <LoadingDots />;
     }
 
-    return <AuthContext value={user}>{children}</AuthContext>;
+    return <AuthContext.Provider value={user}>{children}</AuthContext.Provider>;
 }
