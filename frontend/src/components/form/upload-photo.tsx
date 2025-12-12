@@ -9,7 +9,7 @@ import { Field, FieldError, FieldLabel } from "../ui/field";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 
-const ACCEPTED_IMAGE_TYPES = ["image/jpg", "image/png"];
+const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/png"];
 
 type UploadImage = {
     file: File;

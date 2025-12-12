@@ -38,7 +38,13 @@ export default function InputField({
                             onChange={(e) =>
                                 field.onChange(parseFloat(e.target.value))
                             }
-                            value={Number.isNaN(field.value) ? "" : field.value}
+                            value={
+                                Number.isNaN(field.value)
+                                    ? ""
+                                    : disabled
+                                    ? 0
+                                    : field.value
+                            }
                         />
                     ) : (
                         <Input

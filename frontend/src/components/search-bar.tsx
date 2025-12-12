@@ -2,6 +2,7 @@
 
 import { FiSearch } from "react-icons/fi";
 import { Button } from "./ui/button";
+import { Card } from "./ui/card";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import {
@@ -14,14 +15,14 @@ import {
 
 export default function SearchBar() {
     return (
-        <article className="w-full max-w-5xl mx-auto bg-white border border-gray-100 rounded-3xl shadow-lg p-6 lg:p-8">
+        <Card className="w-full max-w-5xl mx-auto rounded-3xl shadow-lg p-6 lg:p-8">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <div>
-                    <Label className="text-sm text-gray-600 mb-2 block">
+                    <Label className="text-sm text-muted-foreground mb-2 block">
                         Brand
                     </Label>
                     <Select>
-                        <SelectTrigger className="w-full bg-gray-50 border-gray-200 rounded-xl">
+                        <SelectTrigger className="w-full">
                             <SelectValue placeholder="All Brands" />
                         </SelectTrigger>
                         <SelectContent>
@@ -38,11 +39,11 @@ export default function SearchBar() {
                 </div>
 
                 <div>
-                    <Label className="text-sm text-gray-600 mb-2 block">
+                    <Label className="text-sm text-muted-foreground mb-2 block">
                         Year
                     </Label>
                     <Select>
-                        <SelectTrigger className="w-full bg-gray-50 border-gray-200 rounded-xl">
+                        <SelectTrigger className="w-full">
                             <SelectValue placeholder="Any Year" />
                         </SelectTrigger>
                         <SelectContent>
@@ -57,11 +58,11 @@ export default function SearchBar() {
                 </div>
 
                 <div>
-                    <Label className="text-sm text-gray-600 mb-2 block">
+                    <Label className="text-sm text-muted-foreground mb-2 block">
                         Type
                     </Label>
                     <Select>
-                        <SelectTrigger className="w-full bg-gray-50 border-gray-200 rounded-xl">
+                        <SelectTrigger className="w-full">
                             <SelectValue placeholder="Any Type" />
                         </SelectTrigger>
                         <SelectContent>
@@ -80,16 +81,14 @@ export default function SearchBar() {
 
             <div className="mt-4 flex gap-2">
                 <div className="flex-1 relative">
-                    <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                    <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                     <Input
                         placeholder="Search by model, keyword..."
-                        className="pl-10 bg-gray-50 border-gray-200 rounded-xl"
+                        className="pl-10"
                     />
                 </div>
-                <Button className="bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white shadow-lg shadow-emerald-500/30 px-8 rounded-xl">
-                    Search
-                </Button>
+                <Button className="px-8 font-semibold">Search</Button>
             </div>
-        </article>
+        </Card>
     );
 }

@@ -1,10 +1,11 @@
 "use client";
 
-import { getCarBrands } from "@/api/cars";
+import { getCarBodyTypes, getCarBrands, sellCar } from "@/api/cars";
 import { getLocation } from "@/api/location";
 import InputField from "@/components/form/input-field";
 import SelectField from "@/components/form/select-field";
 import UploadPhoto from "@/components/form/upload-photo";
+import LoadingDots from "@/components/loader";
 import { Button } from "@/components/ui/button";
 import {
     Card,
@@ -19,12 +20,13 @@ import {
     FieldGroup,
     FieldLabel,
 } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 import { AuthContext } from "@/providers";
-import { Brand } from "@/types";
+import { BodyType, Brand } from "@/types";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useContext, useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -32,10 +34,11 @@ import { FaCheck } from "react-icons/fa6";
 import * as z from "zod";
 
 const MAX_FILE_SIZE = 10000000;
-const ACCEPTED_IMAGE_TYPES = ["image/jpg", "image/png"];
+const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/png"];
 
 const formSchema = z.object({
     brand: z.string().min(1, { error: "Please select a car brand" }),
+    bodyType: z.string().min(1, { error: "Please select a car body type" }),
     model: z.string().min(1, { error: "Please enter the car model" }),
     year: z
         .number({ error: "Please enter a valid year" })
@@ -86,15 +89,6 @@ const formSchema = z.object({
                 message: "Only .jpg, .jpeg, .png and .webp files are accepted.",
             }
         ),
-    name: z
-        .string()
-        .min(2, {
-            message: "Name must be at least 2 characters long",
-        })
-        .max(100, {
-            message: "Name must be at most 100 characters long",
-        }),
-    email: z.email({ pattern: z.regexes.rfc5322Email }),
     phone: z
         .string()
         .refine((val) => /(84|0[3|5|7|8|9])+([0-9]{8})\b/g.test(val), {
@@ -127,14 +121,27 @@ export default function SellPage() {
         queryKey: ["brands"],
     });
 
-    const nameBrands = useMemo(() => {
-        return brands?.map((brand) => brand.name);
+    const brandsOption = useMemo(() => {
+        return brands?.map((brand) => ({ label: brand.name, value: brand.id }));
     }, [brands]);
+
+    const { data: bodyTypes } = useQuery<BodyType[]>({
+        queryFn: getCarBodyTypes,
+        queryKey: ["body-types"],
+    });
+
+    const bodyTypesOption = useMemo(() => {
+        return bodyTypes?.map((bodyType) => ({
+            label: bodyType.name,
+            value: bodyType.id,
+        }));
+    }, [bodyTypes]);
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
             brand: "",
+            bodyType: "",
             model: "",
             year: new Date().getFullYear(),
             price: 0,
@@ -145,21 +152,30 @@ export default function SellPage() {
             description: "",
             location: "",
             images: [],
-            name: "",
-            email: "",
             phone: "",
         },
         mode: "all",
     });
 
-    useEffect(() => {
-        if (user) {
-            form.setValue("name", user.name);
-            form.setValue("email", user.email);
-        }
-    }, [user, form]);
-
     const condition = form.watch("condition");
+
+    const { mutateAsync: sellCarMutation, isPending } = useMutation({
+        mutationFn: (data: z.infer<typeof formSchema>) => sellCar(data),
+        onSuccess: () => {
+            router.push("/");
+        },
+        onError: (error: Error) => {
+            console.log(form.getValues());
+        },
+    });
+
+    if (isPending) {
+        return <LoadingDots />;
+    }
+
+    function onSubmit(data: z.infer<typeof formSchema>) {
+        sellCarMutation(data);
+    }
 
     return (
         <main>
@@ -228,7 +244,10 @@ export default function SellPage() {
                             </CardHeader>
 
                             <CardContent className="p-6 lg:p-8">
-                                <form id="sell-form">
+                                <form
+                                    id="sell-form"
+                                    onSubmit={form.handleSubmit(onSubmit)}
+                                >
                                     {currentStep === 0 && (
                                         <FieldGroup className="grid md:grid-cols-2 gap-6">
                                             <SelectField
@@ -236,7 +255,15 @@ export default function SellPage() {
                                                 name="brand"
                                                 label="Brand *"
                                                 placeholder="Select brand"
-                                                options={nameBrands ?? []}
+                                                options={brandsOption ?? []}
+                                            />
+
+                                            <SelectField
+                                                control={form.control}
+                                                name="bodyType"
+                                                label="Body Type *"
+                                                placeholder="Select body type"
+                                                options={bodyTypesOption ?? []}
                                             />
 
                                             <InputField
@@ -266,7 +293,7 @@ export default function SellPage() {
                                                 name="mileage"
                                                 type="number"
                                                 label="Mileage (km)"
-                                                disabled={condition === "New"}
+                                                disabled={condition === "NEW"}
                                             />
 
                                             <SelectField
@@ -275,10 +302,22 @@ export default function SellPage() {
                                                 label="Fuel Type *"
                                                 placeholder="Select Fuel Type"
                                                 options={[
-                                                    "Electric",
-                                                    "Hybrid",
-                                                    "Petrol",
-                                                    "Diesel",
+                                                    {
+                                                        label: "Electric",
+                                                        value: "ELECTRIC",
+                                                    },
+                                                    {
+                                                        label: "Hybrid",
+                                                        value: "HYBRID",
+                                                    },
+                                                    {
+                                                        label: "Petrol",
+                                                        value: "PETROL",
+                                                    },
+                                                    {
+                                                        label: "Diesel",
+                                                        value: "DIESEL",
+                                                    },
                                                 ]}
                                             />
 
@@ -288,24 +327,47 @@ export default function SellPage() {
                                                 label="Condition *"
                                                 placeholder="Select condition"
                                                 options={[
-                                                    "New",
-                                                    "Like New",
-                                                    "Used",
-                                                    "Certified Pre-Owned",
+                                                    {
+                                                        label: "New",
+                                                        value: "NEW",
+                                                    },
+                                                    {
+                                                        label: "Like New",
+                                                        value: "LIKE_NEW",
+                                                    },
+                                                    {
+                                                        label: "Used",
+                                                        value: "USED",
+                                                    },
+                                                    {
+                                                        label: "Certified Pre-Owned",
+                                                        value: "CERTIFIED_PREOWNED",
+                                                    },
                                                 ]}
                                             />
 
-                                            <SelectField
-                                                control={form.control}
-                                                name="transmission"
-                                                label="Transmission *"
-                                                placeholder="Select transmission"
-                                                options={[
-                                                    "Automatic",
-                                                    "Manual",
-                                                    "CVT",
-                                                ]}
-                                            />
+                                            <div className="col-span-2">
+                                                <SelectField
+                                                    control={form.control}
+                                                    name="transmission"
+                                                    label="Transmission *"
+                                                    placeholder="Select transmission"
+                                                    options={[
+                                                        {
+                                                            label: "Automatic",
+                                                            value: "AUTOMATIC",
+                                                        },
+                                                        {
+                                                            label: "Manual",
+                                                            value: "MANUAL",
+                                                        },
+                                                        {
+                                                            label: "CVT",
+                                                            value: "CVT",
+                                                        },
+                                                    ]}
+                                                />
+                                            </div>
                                         </FieldGroup>
                                     )}
 
@@ -358,22 +420,34 @@ export default function SellPage() {
 
                                     {currentStep === 2 && (
                                         <FieldGroup>
-                                            <InputField
-                                                control={form.control}
-                                                name="name"
-                                                label="Name *"
-                                                type="text"
-                                                disabled={true}
-                                            />
+                                            <Field>
+                                                <FieldLabel htmlFor="name">
+                                                    Name *
+                                                </FieldLabel>
 
-                                            <div className="grid md:grid-cols-2 gap-6">
-                                                <InputField
-                                                    control={form.control}
-                                                    name="email"
-                                                    label="Email *"
-                                                    type="email"
+                                                <Input
+                                                    id="name"
+                                                    value={user?.name || ""}
+                                                    type="text"
                                                     disabled={true}
                                                 />
+                                            </Field>
+
+                                            <div className="grid md:grid-cols-2 gap-6">
+                                                <Field>
+                                                    <FieldLabel htmlFor="email">
+                                                        Email *
+                                                    </FieldLabel>
+
+                                                    <Input
+                                                        id="email"
+                                                        value={
+                                                            user?.email || ""
+                                                        }
+                                                        type="email"
+                                                        disabled={true}
+                                                    />
+                                                </Field>
 
                                                 <InputField
                                                     control={form.control}
@@ -456,6 +530,8 @@ export default function SellPage() {
                                             </Button>
 
                                             <Button
+                                                type="submit"
+                                                form="sell-form"
                                                 disabled={
                                                     !form.formState.isValid
                                                 }

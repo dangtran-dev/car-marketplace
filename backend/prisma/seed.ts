@@ -124,6 +124,23 @@ async function main() {
   });
 
   console.log('Seeded all car brands successfully!');
+
+  const bodyTypes = [
+    { name: 'Sedan' },
+    { name: 'SUV' },
+    { name: 'Hatchback' },
+    { name: 'Coupe' },
+    { name: 'Convertible' },
+    { name: 'Wagon' },
+    { name: 'Van' },
+    { name: 'Pickup Truck' },
+    { name: 'Crossover' },
+  ];
+
+  await prisma.bodyType.createMany({
+    data: bodyTypes,
+    skipDuplicates: true,
+  });
 }
 
 main()

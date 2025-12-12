@@ -9,6 +9,10 @@ export class CreateCarDto {
 
   @IsNotEmpty()
   @IsString()
+  bodyType: string;
+
+  @IsNotEmpty()
+  @IsString()
   model: string;
 
   @IsNotEmpty()

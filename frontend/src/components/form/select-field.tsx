@@ -13,7 +13,7 @@ type SelectFieldProps = {
     name: string;
     label: string;
     placeholder?: string;
-    options: string[];
+    options: { label: string; value: string }[] | string[];
 };
 
 export default function SelectField({
@@ -45,8 +45,17 @@ export default function SelectField({
 
                         <SelectContent>
                             {options?.map((option, index) => (
-                                <SelectItem key={index} value={option}>
-                                    {option}
+                                <SelectItem
+                                    key={index}
+                                    value={
+                                        typeof option === "string"
+                                            ? option
+                                            : option.value
+                                    }
+                                >
+                                    {typeof option === "string"
+                                        ? option
+                                        : option.label}
                                 </SelectItem>
                             ))}
                         </SelectContent>

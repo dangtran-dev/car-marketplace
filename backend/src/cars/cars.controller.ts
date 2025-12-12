@@ -6,10 +6,12 @@ import {
   UploadedFiles,
   UseInterceptors,
   UseGuards,
+  Query,
+  Param,
 } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { CarsService } from './cars.service';
-import { CreateCarDto } from './dto';
+import { CreateCarDto, PaginationDto } from './dto';
 import { getUser } from 'src/common/decorator';
 import { JwtAccessAuthGuard } from 'src/common/guards';
 
@@ -17,9 +19,24 @@ import { JwtAccessAuthGuard } from 'src/common/guards';
 export class CarsController {
   constructor(private carsService: CarsService) {}
 
+  @Get()
+  getAllCars(@Query() paginationDto: PaginationDto) {
+    return this.carsService.getAllCars(paginationDto);
+  }
+
   @Get('brands')
   getCarBrands() {
     return this.carsService.getCarBrands();
+  }
+
+  @Get('body-types')
+  getCarBodyTypes() {
+    return this.carsService.getCarBodyTypes();
+  }
+
+  @Get('filters')
+  getCarFilters() {
+    return this.carsService.getCarFilters();
   }
 
   @Post('sell')
@@ -31,5 +48,10 @@ export class CarsController {
     @getUser('id') userId: string,
   ) {
     return this.carsService.sellCar(files, dto, userId);
+  }
+
+  @Get(':id')
+  getCar(@Param('id') id: string) {
+    return this.carsService.getCar(id);
   }
 }

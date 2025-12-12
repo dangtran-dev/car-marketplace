@@ -61,15 +61,15 @@ export default function Header() {
     });
 
     return (
-        <header className="sticky top-0 z-50 w-full bg-white/95 backdrop-blur-sm border-b border-gray-200 shadow-sm">
+        <header className="sticky top-0 z-50 w-full bg-background backdrop-blur-sm shadow-sm">
             <div className="container mx-auto px-4 lg:px-8">
                 <section className="flex items-center justify-between h-16 lg:h-20">
                     <div className="flex items-center gap-2">
-                        <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 shadow-lg">
+                        <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-primary shadow-lg">
                             <TiFlashOutline className="w-7 h-7 text-white" />
                         </div>
 
-                        <span className="text-xl text-gray-900">
+                        <span className="text-xl text-foreground">
                             <span className="font-semibold">Eco</span>
 
                             <span>Drive</span>
@@ -83,8 +83,8 @@ export default function Header() {
                                 href={link.path}
                                 className={`transition-colors font-medium ${
                                     isActive(link.path)
-                                        ? "text-emerald-600"
-                                        : "text-gray-600 hover:text-emerald-600"
+                                        ? "text-primary"
+                                        : "text-muted-foreground hover:text-primary"
                                 }`}
                             >
                                 {link.label}
@@ -176,14 +176,14 @@ export default function Header() {
                             <Link href={"/signin"}>
                                 <Button
                                     variant="outline"
-                                    className="border-emerald-600 text-emerald-600 font-semibold hover:bg-emerald-50"
+                                    className="border-primary text-primary font-semibold hover:border-accent"
                                 >
                                     Sign In
                                 </Button>
                             </Link>
 
                             <Link href={"/signup"}>
-                                <Button className="font-semibold bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white shadow-lg shadow-emerald-500/30">
+                                <Button className="font-semibold bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg shadow-primary/30">
                                     Get Started
                                 </Button>
                             </Link>
